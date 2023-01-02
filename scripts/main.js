@@ -1,10 +1,20 @@
 import "../style.css";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 function animate() {
   requestAnimationFrame(animate);
-  console.log(camera.position);
+  // const currentTimeline = window.pageYOffset / 1500;
+  // if (currentTimeline < 1) {
+  //   const pos = curve.getPointAt(currentTimeline);
+  //   camera.position.copy(pos);
+  //   console.log(curve.getPointAt(currentTimeline));
+  // }
+
+  camera.lookAt(0, 30, -10);
+  // console.log(camera.position);
+  controls.update();
   renderer.render(scene, camera);
 }
 
@@ -22,8 +32,8 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.set(175, 162, 182);
-camera.lookAt(new THREE.Vector3(0, 10, 0));
+camera.position.set(0, 30, -40);
+camera.lookAt(0, 30, -10);
 
 // ! creating lights
 const pointlight = new THREE.PointLight(0xffffff);
@@ -63,4 +73,22 @@ assetLoader.load(
   }
 );
 
+const curve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-10, 0, 10),
+  new THREE.Vector3(-5, 5, 5),
+  new THREE.Vector3(0, 0, 0),
+  new THREE.Vector3(5, -5, 5),
+  new THREE.Vector3(10, 0, 10),
+]);
+
+const points = curve.getPoints(50);
+const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+// Create the final object to add to the scene
+const curveObject = new THREE.Line(geometry, material);
+scene.add(curveObject);
+
+const controls = new OrbitControls(camera, renderer.domElement);
 animate();

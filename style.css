@@ -4,3 +4,7 @@ canvas {
   left:0;
   
 }
+
+body {
+  min-height: calc(3000px + 100vh);
+}
