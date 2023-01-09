@@ -12,6 +12,7 @@
     "vite": "^4.0.0"
   },
   "dependencies": {
+    "@seregpie/three.text-texture": "^3.2.1",
     "three": "^0.148.0"
   }
 }
