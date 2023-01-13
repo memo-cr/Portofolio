@@ -1,39 +1,21 @@
 import "../style.css";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import TextTexture from "@seregpie/three.text-texture";
-// * import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 function animate() {
   requestAnimationFrame(animate);
+  
+  // const currentTimeline = window.pageYOffset / 3000; // ? following section takes the pos from currenttimeline and follows the line
+  // if (currentTimeline < 1) {
+  //   const pos = curve.getPointAt(currentTimeline);
+  //   camera.position.copy(pos);
+  //   camera.lookAt(0, 24, 10);
+    
+  // }
 
-  const currentTimeline = window.pageYOffset / 3000; // ? following section takes the pos from currenttimeline and follows the line
-  if (currentTimeline < 1) {
-    const pos = curve.getPointAt(currentTimeline);
-    camera.position.copy(pos);
-    camera.lookAt(0, 24, 10);
-    texture.text = "";
-    texture.text = [
-      "Hi there,",
-      "My name is Mehmet Caran",
-      "i am a Software Engineer/Developer",
-    ].join("\n");
-  }
-
-  if (currentTimeline > 0.5) {
-    texture.redraw();
-    texture.text = "";
-    texture.text = [
-      "Hi there,",
-      "My name is Dominik Auer",
-      "i am a Software Engineer/Developer",
-    ].join("\n");
-  }
-
-  // console.log(camera.position);
-  // controls.update();
-  texture.lineGap = 0;
-  texture.redraw();
+  console.log(camera.position);
+  controls.update();
   renderer.render(scene, camera);
 }
 
@@ -56,13 +38,12 @@ camera.position.set(0, 25, 0);
 camera.lookAt(0, 30, -1000);
 
 // ! creating lights
-const light = new THREE.SpotLight(0xffffff);
-light.position.set(32, -17, -17);
+const light = new THREE.PointLight(0xffffff);
+light.position.set(20, 20, -30);
 
-light.castShadow = true;
+light.castShadow = true;  
 
-light.intensity = 1.5;
-
+light.intensity = 1;
 light.shadow.mapSize.width = 1024;
 light.shadow.mapSize.height = 1024;
 light.shadow.camera.near = 1;
@@ -71,10 +52,12 @@ light.shadow.camera.fov = 90;
 light.shadow.camera.top = 10;
 scene.add(light);
 
-// const ambientLight = new THREE.AmbientLight(0x808080);
-// ambientLight.intensity = 0.5;
-// ambientLight.castShadow = true;
-// scene.add(ambientLight);
+const lighthelper = new THREE.PointLightHelper( light, 1);
+scene.add(lighthelper);
+const ambientLight = new THREE.AmbientLight(0x808080);
+ambientLight.intensity = 1;
+ambientLight.castShadow = true;
+scene.add(ambientLight);
 
 scene.background = new THREE.Color("#ADD8E6");
 
@@ -82,14 +65,27 @@ scene.background = new THREE.Color("#ADD8E6");
 
 const assetLoader = new GLTFLoader();
 assetLoader.load(
-  "assets/c64_monitor.glb",
+  "assets/MehmetsWorldTest.glb",
   function (gltf) {
+
+    gltf.scene.traverse( function ( object ) {
+
+      if ( object.isMesh ) {
+          object.material.shading = THREE.SmoothShading;
+          object.castShadow = true;
+          object.receiveShadow = true;
+  
+      }
+  
+  } );
+
     const model = gltf.scene;
     model.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true;
       }
     });
+    model.position.setY(-9.9)
     scene.add(model);
   },
   undefined,
@@ -100,8 +96,8 @@ assetLoader.load(
 
 // ! floor
 
-var floorMaterial = new THREE.MeshStandardMaterial({
-  color: "#ADD8E6",
+var floorMaterial = new THREE.MeshToonMaterial({
+  color: "#90ee90",
   side: THREE.DoubleSide,
 });
 var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
@@ -111,40 +107,6 @@ floor.doubleSided = true;
 floor.receiveShadow = true;
 floor.position.y = -10;
 scene.add(floor);
-
-let texture = new TextTexture({
-  alignment: "left",
-  color: "#24ff00",
-  fontFamily: '" Consolas"',
-  fontSize: 32,
-  text: [
-    "> Hi there,",
-    "> My name is Mehmet Caran",
-    "> i am a Software Engineer/Developer",
-  ].join("\n"),
-});
-
-const geometry1 = new THREE.PlaneGeometry(27, 27);
-const material1 = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-  // map: texture,
-  side: THREE.DoubleSide,
-});
-
-const material5 = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-  map: texture,
-  side: THREE.DoubleSide,
-});
-const plane = new THREE.Mesh(geometry1, material5);
-plane.position.set(0, 25, 17.5);
-scene.add(plane);
-plane.rotation.y = Math.PI;
-
-const plane1 = new THREE.Mesh(geometry1, material1);
-plane1.position.set(0, 25, 17.5);
-scene.add(plane1);
-plane1.rotation.y = Math.PI;
 
 const curve = new THREE.CatmullRomCurve3([
   new THREE.Vector3(0, 25, 0),
@@ -161,5 +123,21 @@ const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
 // Create the final object to add to the scene
 const curveObject = new THREE.Line(geometry, material);
 // scene.add(curveObject);
-// const controls = new OrbitControls(camera, renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
 animate();
+
+
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize() {
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+
+}

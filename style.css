@@ -6,5 +6,5 @@ canvas {
 }
 
 body {
-  min-height: calc(3000px + 100vh);
+  /* min-height: calc(3000px + 100vh); */
 }
