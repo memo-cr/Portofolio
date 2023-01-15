@@ -5,13 +5,13 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 function animate() {
   requestAnimationFrame(animate);
-  
+
   // const currentTimeline = window.pageYOffset / 3000; // ? following section takes the pos from currenttimeline and follows the line
   // if (currentTimeline < 1) {
   //   const pos = curve.getPointAt(currentTimeline);
   //   camera.position.copy(pos);
   //   camera.lookAt(0, 24, 10);
-    
+
   // }
 
   console.log(camera.position);
@@ -41,7 +41,7 @@ camera.lookAt(0, 30, -1000);
 const light = new THREE.PointLight(0xffffff);
 light.position.set(20, 20, -30);
 
-light.castShadow = true;  
+light.castShadow = true;
 
 light.intensity = 1;
 light.shadow.mapSize.width = 1024;
@@ -52,7 +52,7 @@ light.shadow.camera.fov = 90;
 light.shadow.camera.top = 10;
 scene.add(light);
 
-const lighthelper = new THREE.PointLightHelper( light, 1);
+const lighthelper = new THREE.PointLightHelper(light, 1);
 scene.add(lighthelper);
 const ambientLight = new THREE.AmbientLight(0x808080);
 ambientLight.intensity = 1;
@@ -67,17 +67,13 @@ const assetLoader = new GLTFLoader();
 assetLoader.load(
   "assets/MehmetsWorldTest.glb",
   function (gltf) {
-
-    gltf.scene.traverse( function ( object ) {
-
-      if ( object.isMesh ) {
-          object.material.shading = THREE.SmoothShading;
-          object.castShadow = true;
-          object.receiveShadow = true;
-  
+    gltf.scene.traverse(function (object) {
+      if (object.isMesh) {
+        object.material.shading = THREE.SmoothShading;
+        object.castShadow = true;
+        object.receiveShadow = true;
       }
-  
-  } );
+    });
 
     const model = gltf.scene;
     model.traverse(function (node) {
@@ -85,7 +81,7 @@ assetLoader.load(
         node.castShadow = true;
       }
     });
-    model.position.setY(-9.9)
+    model.position.setY(-9.9);
     scene.add(model);
   },
   undefined,
@@ -128,16 +124,36 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 animate();
 
+//create image
+var bitmap = document.createElement("canvas");
+var g = bitmap.getContext("2d");
+bitmap.width = 100;
+bitmap.height = 100;
+g.font = "Bold 20px Arial";
 
+g.fillStyle = "white";
+g.fillText(text, 0, 20);
+g.strokeStyle = "black";
+g.strokeText(text, 0, 20);
 
+// canvas contents will be used for a texture
+var texture = new THREE.Texture(bitmap);
+texture.needsUpdate = true;
 
-window.addEventListener( 'resize', onWindowResize, false );
+const geometryplane = new THREE.PlaneGeometry(100, 100);
+const materialplane = new THREE.MeshBasicMaterial({
+  color: 0xffff00,
+  side: THREE.DoubleSide,
+});
+const plane = new THREE.Mesh(geometryplane, materialplane);
+plane.position.set(0, 100, 0);
+scene.add(plane);
+
+window.addEventListener("resize", onWindowResize, false);
 
 function onWindowResize() {
-
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
-
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
