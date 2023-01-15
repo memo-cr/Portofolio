@@ -2,6 +2,7 @@ import "../style.css";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 function animate() {
   requestAnimationFrame(animate);
@@ -14,7 +15,7 @@ function animate() {
 
   // }
 
-  console.log(camera.position);
+  // console.log(camera.position);
   controls.update();
   renderer.render(scene, camera);
 }
@@ -38,7 +39,7 @@ camera.position.set(0, 25, 0);
 camera.lookAt(0, 30, -1000);
 
 // ! creating lights
-const light = new THREE.PointLight(0xffffff);
+const light = new THREE.DirectionalLight(0xffffff);
 light.position.set(20, 20, -30);
 
 light.castShadow = true;
@@ -52,37 +53,28 @@ light.shadow.camera.fov = 90;
 light.shadow.camera.top = 10;
 scene.add(light);
 
-const lighthelper = new THREE.PointLightHelper(light, 1);
-scene.add(lighthelper);
+// const lighthelper = new THREE.PointLightHelper(light, 1);
+// scene.add(lighthelper);
 const ambientLight = new THREE.AmbientLight(0x808080);
 ambientLight.intensity = 1;
-ambientLight.castShadow = true;
+// ambientLight.castShadow = true;
 scene.add(ambientLight);
 
 scene.background = new THREE.Color("#ADD8E6");
 
 // ! loading texture
 
-const assetLoader = new GLTFLoader();
+const assetLoader = new FBXLoader(); //change fbx to gltf
 assetLoader.load(
-  "assets/MehmetsWorldTest.glb",
-  function (gltf) {
-    gltf.scene.traverse(function (object) {
-      if (object.isMesh) {
-        object.material.shading = THREE.SmoothShading;
-        object.castShadow = true;
-        object.receiveShadow = true;
+  "assets/BirchTree_1_FBX.fbx",
+  (object) => {
+    object.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true;
       }
     });
-
-    const model = gltf.scene;
-    model.traverse(function (node) {
-      if (node.isMesh) {
-        node.castShadow = true;
-      }
-    });
-    model.position.setY(-9.9);
-    scene.add(model);
+    object.scale.set(0.01, 0.01, 0.01);
+    scene.add(object);
   },
   undefined,
   function (err) {
@@ -124,6 +116,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 animate();
 
+var text = "hello world";
 //create image
 var bitmap = document.createElement("canvas");
 var g = bitmap.getContext("2d");
@@ -145,6 +138,7 @@ const materialplane = new THREE.MeshBasicMaterial({
   color: 0xffff00,
   side: THREE.DoubleSide,
 });
+
 const plane = new THREE.Mesh(geometryplane, materialplane);
 plane.position.set(0, 100, 0);
 scene.add(plane);
