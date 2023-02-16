@@ -15,7 +15,7 @@ function animate() {
 
   // }
 
-  // console.log(camera.position);
+  console.log(camera.position);
   controls.update();
   renderer.render(scene, camera);
 }
@@ -66,7 +66,7 @@ scene.background = new THREE.Color("#ADD8E6");
 
 const assetLoader = new FBXLoader(); //change fbx to gltf
 assetLoader.load(
-  "assets/BirchTree_1_FBX.fbx",
+  "assets/MehmetRoom.fbx",
   (object) => {
     object.traverse(function (child) {
       if (child.isMesh) {
@@ -74,6 +74,7 @@ assetLoader.load(
       }
     });
     object.scale.set(0.01, 0.01, 0.01);
+    object.position.set(0, -10, 0);
     scene.add(object);
   },
   undefined,
